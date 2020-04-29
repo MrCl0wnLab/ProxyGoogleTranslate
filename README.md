@@ -5,7 +5,7 @@
 [![Build](https://img.shields.io/badge/Supported_OS-Mac-orange.svg)]()
 ![GitHub](https://img.shields.io/github/license/MrCl0wnLab/SenderMailgunPython?color=blue)
 
-Modulo Python criado para envio de requests usando Google Translate como Proxy.
+Python Module criado para envio de requests usando Google Translate como Proxy.
 
 ```
  + Autor: MrCl0wn
