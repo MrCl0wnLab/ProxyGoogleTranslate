@@ -36,29 +36,31 @@ def process_request_proxy(url):
 
         return_html = requests.get(target_url, timeout=20, headers=HEADERS)
 
-        if return_html:
-            url_request = checker_url(
-                return_html.text, f'{BASE_URL_PROXY}/translate_p?hl=pt-BR&sl=en&tl=pt&u=')
+        if not return_html:
+            return
 
-            request_final = requests.get(
-                    url_request,
-                    timeout=20,
-                    headers={
-                        'User-Agent': 'android'}
-                    )
+        url_request = checker_url(
+            return_html.text, f'{BASE_URL_PROXY}/translate_p?hl=pt-BR&sl=en&tl=pt&u=')
 
-            url_request_proxy = html.unescape(checker_url(
-                request_final.text, f'{BASE_URL_PROXY}/translate_c?depth=1'))
+        request_final = requests.get(
+                url_request,
+                timeout=20,
+                headers={
+                    'User-Agent': 'android'}
+                )
 
-            timenow = str(datetime.datetime.now())
-            result = requests.get(
-                    url_request_proxy,
-                    timeout=20,
-                    headers={
-                        'User-Agent': 'android'
-                    })
+        url_request_proxy = html.unescape(checker_url(
+            request_final.text, f'{BASE_URL_PROXY}/translate_c?depth=1'))
 
-            return {'url': url.strip(), 'time': timenow, 'result': result}
+        timenow = str(datetime.datetime.now())
+        result = requests.get(
+                url_request_proxy,
+                timeout=20,
+                headers={
+                    'User-Agent': 'android'
+                })
+
+        return {'url': url.strip(), 'time': timenow, 'result': result}
     except Exception as e:
         print(e)
 
