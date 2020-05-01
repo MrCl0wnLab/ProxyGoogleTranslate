@@ -5,6 +5,8 @@ import datetime
 import threading
 import requests
 from urllib import request
+import sys
+from concurrent.futures import ThreadPoolExecutor
 
 HEADERS = {
     'Host': 'translate.google.com',
@@ -16,8 +18,8 @@ MAX_CONECTION_THREAD = 10
 URL_PROCESS = []
 
 
-base_url_proxy = 'https://translate.googleusercontent.com'
-base_url_translate = 'https://translate.google.com/translate?hl=pt-BR&sl=en&tl=pt&u=[TARGET_URL]&sandbox=0'
+BASE_URL_PROXY = 'https://translate.googleusercontent.com'
+BASE_URL_TRANSLATE = 'https://translate.google.com/translate?hl=pt-BR&sl=en&tl=pt&u=[TARGET_URL]&sandbox=0'
 
 
 def checker_url(html, url):
@@ -28,73 +30,56 @@ def checker_url(html, url):
             return url_result_regex[0]
 
 
-def process_request_proxy(url_list):
-
-    url_list_process = []
-    url_list_process.append(url_list)
+def process_request_proxy(url):
+    if not url:
+        return
 
     try:
-        for url in url_list_process:
-            if url:
-                target_url = base_url_translate.replace(
-                    '[TARGET_URL]', request.quote(url))
+        target_url = BASE_URL_TRANSLATE.replace('[TARGET_URL]', request.quote(url))
 
-                return_html = requests.get(
-                    target_url, timeout=20, headers=HEADERS)
-                if return_html:
-                    url_request = checker_url(
-                        return_html.text, f'{base_url_proxy}/translate_p?hl=pt-BR&sl=en&tl=pt&u=')
+        return_html = requests.get(target_url, timeout=20, headers=HEADERS)
 
-                    request_final = requests.get(url_request, timeout=20, headers={
-                                                 'User-Agent': 'android'})
+        if return_html:
+            url_request = checker_url(
+                return_html.text, f'{BASE_URL_PROXY}/translate_p?hl=pt-BR&sl=en&tl=pt&u=')
 
-                    url_request_proxy = html.unescape(checker_url(
-                        request_final.text, f'{base_url_proxy}/translate_c?depth=1'))
+            request_final = requests.get(
+                    url_request,
+                    timeout=20,
+                    headers={
+                        'User-Agent': 'android'}
+                    )
 
-                    timenow = str(datetime.datetime.now())
-                    result = requests.get(url_request_proxy, timeout=20, headers={
-                                          'User-Agent': 'android'})
+            url_request_proxy = html.unescape(checker_url(
+                request_final.text, f'{BASE_URL_PROXY}/translate_c?depth=1'))
 
-                    RESULT_URLS_THREAD.append(
-                        {'url': url.strip(), 'time': timenow, 'result': result})
+            timenow = str(datetime.datetime.now())
+            result = requests.get(
+                    url_request_proxy,
+                    timeout=20,
+                    headers={
+                        'User-Agent': 'android'
+                    })
+
+            return {'url': url.strip(), 'time': timenow, 'result': result}
     except Exception as e:
         print(e)
 
 
-def select_range_url(total_select_url):
-    tmp_urls = []
-    try:
-        for url in range(total_select_url):
-            if url:
-                tmp_urls.append(URL_PROCESS[url])
-                URL_PROCESS.pop(url)
-    except:
-        pass
-    return tmp_urls
-
-
-def process_translate_engine_thread(urls, count_url):
-    process_request_proxy(urls)
-
-
 def request_proxy(urls_file):
+    executor = ThreadPoolExecutor(max_workers=MAX_CONECTION_THREAD)
+    for result in executor.map(process_request_proxy, urls_file):
+        yield result
 
-    list_threads = []
-    count_url = 0
-    RESULT_URLS_THREAD.clear()
+    executor.shutdown(wait=True)
 
-    for target_url in urls_file:
 
-        while threading.active_count() > MAX_CONECTION_THREAD:
-            time.sleep(0.5)
+# Using as command line
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print('Usage:')
+        print(f'\tpython {sys.argv[0]} [host1] [host2] ... [hostn]\n')
+        sys.exit(0)
 
-        thread = threading.Thread(
-            target=process_translate_engine_thread, args=(target_url, count_url))
-
-        count_url += 1
-
-        list_threads.append(thread)
-        thread.start()
-
-    for thread in list_threads:
-        thread.join()
+    hosts = sys.argv[1:]
+    print(list(request_proxy(hosts)))
