@@ -13,10 +13,7 @@ HEADERS = {
     'User-Agent': 'android'
 }
 
-RESULT_URLS_THREAD = []
 MAX_CONECTION_THREAD = 10
-URL_PROCESS = []
-
 
 BASE_URL_PROXY = 'https://translate.googleusercontent.com'
 BASE_URL_TRANSLATE = 'https://translate.google.com/translate?hl=pt-BR&sl=en&tl=pt&u=[TARGET_URL]&sandbox=0'
