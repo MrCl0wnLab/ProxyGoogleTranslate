@@ -20,7 +20,7 @@ Python Module criado para envio de requests usando Google Translate como Proxy.
 
 ## Dependências
 
-- [requests][https://requests.readthedocs.io/en/master/]
+- [requests](https://requests.readthedocs.io/en/master/)
 
 ## Setup
 
