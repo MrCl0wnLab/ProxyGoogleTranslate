@@ -15,6 +15,9 @@ Python Module criado para envio de requests usando Google Translate como Proxy.
  + Email: mrcl0wnlab\@\gmail.com
 ```
 
+## Request flow
+![Screenshot](https://i.imgur.com/1cCcVU1.png)
+
 ## Dependências
 
 - [requests][https://requests.readthedocs.io/en/master/]
