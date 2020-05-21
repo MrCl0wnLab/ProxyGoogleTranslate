@@ -1,5 +1,5 @@
 # Proxy Google Translate
- 
+
 [![Python 3.7](https://img.shields.io/badge/python-3.7-yellow.svg)](https://www.python.org/)
 [![Build](https://img.shields.io/badge/Supported_OS-Linux-orange.svg)]()
 [![Build](https://img.shields.io/badge/Supported_OS-Mac-orange.svg)]()
@@ -18,19 +18,23 @@ Python Module criado para envio de requests usando Google Translate como Proxy.
 ## Request flow
 ![Screenshot](https://i.imgur.com/1cCcVU1.png)
 
-## Implementation Code / Simples
-```python
-import proxytranslate
+## Dependências
 
-url_googl_engine = ['http://ifconfig.ca']
+- [requests](https://requests.readthedocs.io/en/master/)
 
-proxytranslate.request_proxy(url_googl_engine)
-for result_request in proxytranslate.RESULT_URLS_THREAD:
-    print(result_request.get('url'),
-          result_request.get('time'),
-          result_request.get('result').text)
+## Setup
+
+```bash
+$ pip install -r requirements.txt
 ```
-## Implementation Code / Multiple URLs
+
+## Usando via linha de comando
+```bash
+$ python3.7 proxytranslate.py 00000000000000000000000000000000000000dfjjjhv.000webhostapp.com 000000000000000000000000000000000000dbscrfg.000webhostapp.com
+```
+
+## Implementation Code
+
 ```python
 
 import proxytranslate
@@ -57,29 +61,7 @@ urls_list = ['00000000000000000000000000000000000000dfjjjhv.000webhostapp.com',
              '000wechost.000webhostapp.com',
              '000wexbhost.000webhostapp.com']
 
-
-proxytranslate.URL_PROCESS = urls_list
-proxytranslate.MAX_CONECTION_THREAD = 20
-
-count_process_url = 0
-url_tmp = []
-
-for url in proxytranslate.URL_PROCESS:
-
-    url_tmp = proxytranslate.select_range_url(
-        proxytranslate.MAX_CONECTION_THREAD)
-    proxytranslate.request_proxy(url_tmp)
-    try:
-        for result in proxytranslate.RESULT_URLS_THREAD:
-            url_request = result.get('url')
-            time_request = result.get('time')
-            result_request = result.get('result')
-
-            print(
-                f' [{count_process_url}] {time_request} | {url_request} | {result_request.status_code}')
-            count_process_url += 1
-    except:
-        pass
+for result in proxytranslate.request_proxy(urls_list):
+    print(result)
 
 ```
-
